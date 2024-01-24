@@ -138,6 +138,16 @@ func (l *linkedList[E]) Clear() {
 	l.last = nil
 }
 
+func (l *linkedList[E]) ForEach(f func(i int, e E) bool) {
+	index := 0
+	for element := l.first; element != nil; element = element.next {
+		if f(index, element.value) {
+			return
+		}
+		index++
+	}
+}
+
 func (l *linkedList[E]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(l.ToSlice())
 }

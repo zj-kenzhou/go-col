@@ -8,6 +8,7 @@ type List[E any] interface {
 	Set(index int, e E)
 	RemoveIndex(index int)
 	IndexOf(e E) int
+	ForEach(f func(i int, e E) bool)
 }
 
 func NewLinkedList[E any](values ...E) List[E] {

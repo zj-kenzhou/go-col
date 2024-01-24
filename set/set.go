@@ -6,6 +6,7 @@ import (
 
 type Set[E comparable] interface {
 	col.Collection[E]
+	ForEach(func(E) bool)
 }
 
 func NewSet[T comparable](values ...T) Set[T] {

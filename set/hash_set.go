@@ -78,6 +78,14 @@ func (s hashSet[E]) Clear() {
 	}
 }
 
+func (s hashSet[E]) ForEach(f func(E) bool) {
+	for e := range s {
+		if f(e) {
+			return
+		}
+	}
+}
+
 func (s hashSet[E]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s.ToSlice())
 }

@@ -74,6 +74,10 @@ func (s *syncHashSet[E]) Clear() {
 	s.uss.Clear()
 }
 
+func (s *syncHashSet[E]) ForEach(f func(E) bool) {
+	s.uss.ForEach(f)
+}
+
 func (s *syncHashSet[E]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s.ToSlice())
 }
