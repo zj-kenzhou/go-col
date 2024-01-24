@@ -3,11 +3,12 @@ package set
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
 	"testing"
 )
 
-func TestHashSet_Size(t *testing.T) {
-	set := NewSet[string]()
+func TestSyncHashSet_Size(t *testing.T) {
+	set := NewSyncSet[string]()
 	if set.Size() != 0 {
 		t.Error("set is not empty")
 	}
@@ -18,8 +19,8 @@ func TestHashSet_Size(t *testing.T) {
 	}
 }
 
-func TestHashSet_IsEmpty(t *testing.T) {
-	set := NewSet[string]()
+func TestSyncHashSet_IsEmpty(t *testing.T) {
+	set := NewSyncSet[string]()
 	if !set.IsEmpty() {
 		t.Error("set is not empty")
 	}
@@ -30,8 +31,8 @@ func TestHashSet_IsEmpty(t *testing.T) {
 	}
 }
 
-func TestHashSet_Contains(t *testing.T) {
-	set := NewSet[string]("aaa")
+func TestSyncHashSet_Contains(t *testing.T) {
+	set := NewSyncSet[string]("aaa")
 	if !set.Contains("aaa") {
 		t.Error("aaa is not Contains")
 	}
@@ -40,16 +41,16 @@ func TestHashSet_Contains(t *testing.T) {
 	}
 }
 
-func TestHashSet_ToSlice(t *testing.T) {
-	set := NewSet[string]("aaa")
+func TestSyncHashSet_ToSlice(t *testing.T) {
+	set := NewSyncSet[string]("aaa")
 	for i := 0; i < 10; i++ {
 		set.Add(fmt.Sprintf("%v", i))
 	}
 	t.Log(set.ToSlice())
 }
 
-func TestHashSet_Add(t *testing.T) {
-	set := NewSet[string]()
+func TestSyncHashSet_Add(t *testing.T) {
+	set := NewSyncSet[string]()
 	aaAdd := set.Add("aa")
 	if !aaAdd {
 		t.Error("add return is false")
@@ -68,8 +69,8 @@ func TestHashSet_Add(t *testing.T) {
 	t.Log(set.ToSlice())
 }
 
-func TestHashSet_Remove(t *testing.T) {
-	set := NewSet[string]("aa")
+func TestSyncHashSet_Remove(t *testing.T) {
+	set := NewSyncSet[string]("aa")
 	rmFlag := set.Remove("aa")
 	if !rmFlag {
 		t.Error("rm return is false")
@@ -82,8 +83,27 @@ func TestHashSet_Remove(t *testing.T) {
 	}
 }
 
-func TestHashSet_ContainsAll(t *testing.T) {
-	set := NewSet[string]("aa", "bb")
+func TestSyncHashSet_Remove_Concurrent(t *testing.T) {
+	set := NewSyncSet[string]()
+	for i := 0; i < 10000; i++ {
+		set.Add(fmt.Sprintf("%v", i))
+	}
+	var wg sync.WaitGroup
+	wg.Add(10000)
+	for i := 0; i < 10000; i++ {
+		go func(index int) {
+			set.Remove(fmt.Sprintf("%v", index))
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+	if !set.IsEmpty() {
+		t.Error("set is not empty")
+	}
+}
+
+func TestSyncHashSet_ContainsAll(t *testing.T) {
+	set := NewSyncSet[string]("aa", "bb")
 	if !set.ContainsAll([]string{"aa", "bb"}) {
 		t.Error("ContainsAll is false")
 	}
@@ -92,8 +112,8 @@ func TestHashSet_ContainsAll(t *testing.T) {
 	}
 }
 
-func TestHashSet_AddAll(t *testing.T) {
-	set := NewSet[string]()
+func TestSyncHashSet_AddAll(t *testing.T) {
+	set := NewSyncSet[string]()
 	if !set.AddAll([]string{"aa", "bb"}) {
 		t.Error("addAll return is false")
 	}
@@ -109,8 +129,24 @@ func TestHashSet_AddAll(t *testing.T) {
 	t.Log(set.ToSlice())
 }
 
-func TestHashSet_RemoveAll(t *testing.T) {
-	set := NewSet[string]("aa", "bb")
+func TestSyncHashSet_Add_Concurrent(t *testing.T) {
+	set := NewSyncSet[string]()
+	var wg sync.WaitGroup
+	wg.Add(10000)
+	for i := 0; i < 10000; i++ {
+		go func(index int) {
+			set.Add(fmt.Sprintf("%v", index))
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+	if set.Size() != 10000 {
+		t.Error("set size is not 1000")
+	}
+}
+
+func TestSyncHashSet_RemoveAll(t *testing.T) {
+	set := NewSyncSet[string]("aa", "bb")
 	if !set.RemoveAll([]string{"aa"}) {
 		t.Error("addAll return is false")
 	}
@@ -123,23 +159,23 @@ func TestHashSet_RemoveAll(t *testing.T) {
 	t.Log(set.ToSlice())
 }
 
-func TestHashSet_Clear(t *testing.T) {
-	set := NewSet[string]("aa", "bb")
+func TestSyncHashSet_Clear(t *testing.T) {
+	set := NewSyncSet[string]("aa", "bb")
 	set.Clear()
 	if !set.IsEmpty() {
 		t.Error("set is not empty")
 	}
 }
 
-func TestHashSet_ForEach(t *testing.T) {
-	set := NewSet[string]("aa", "bb", "cc")
+func TestSyncHashSet_ForEach(t *testing.T) {
+	set := NewSyncSet[string]("aa", "bb", "cc")
 	set.ForEach(func(s string) {
 		t.Log(s)
 	})
 }
 
-func TestHashSet_MarshalJSON(t *testing.T) {
-	set := NewSet[string]("aa", "bb", "cc")
+func TestSyncHashSet_MarshalJSON(t *testing.T) {
+	set := NewSyncSet[string]("aa", "bb", "cc")
 	bytes, err := json.Marshal(set)
 	if err != nil {
 		t.Error(err)
@@ -147,9 +183,9 @@ func TestHashSet_MarshalJSON(t *testing.T) {
 	t.Log(string(bytes))
 }
 
-func TestHashSet_UnmarshalJSON(t *testing.T) {
+func TestSyncHashSet_UnmarshalJSON(t *testing.T) {
 	jsonStr := "[\"aa\", \"bb\"]"
-	set := NewSet[string]("cc")
+	set := NewSyncSet[string]("cc")
 	err := json.Unmarshal([]byte(jsonStr), set)
 	if err != nil {
 		t.Error(err)

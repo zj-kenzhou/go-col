@@ -35,7 +35,7 @@ func (l *linkedList[E]) Contains(e E) bool {
 }
 
 func (l *linkedList[E]) ToSlice() []E {
-	var res []E
+	res := make([]E, 0)
 	for element := l.first; element != nil; element = element.next {
 		res = append(res, element.value)
 	}
@@ -56,12 +56,35 @@ func (l *linkedList[E]) Add(e E) bool {
 }
 
 func (l *linkedList[E]) Remove(e E) bool {
-	index := l.IndexOf(e)
-	if index > -1 {
-		l.RemoveIndex(index)
-		return true
+	res := false
+	var removeItem *element[E]
+	for element := l.first; element != nil; element = element.next {
+		if reflect.DeepEqual(element.value, e) {
+			if element.prev == nil && element.next == nil {
+				l.first = nil
+				l.last = nil
+			} else if element.prev == nil {
+				element.next.prev = nil
+				l.first = element.next
+			} else if element.next == nil {
+				element.prev.next = nil
+				l.last = element.prev
+			} else {
+				element.prev.next = element.next
+				element.next.prev = element.prev
+			}
+			removeItem = element
+			l.size--
+			res = true
+		}
+		if removeItem != nil {
+			removeItem = nil
+		}
 	}
-	return false
+	if removeItem != nil {
+		removeItem = nil
+	}
+	return res
 }
 
 func (l *linkedList[E]) withinRange(index int) bool {
@@ -113,20 +136,20 @@ func (l *linkedList[E]) ContainsAll(col []E) bool {
 }
 
 func (l *linkedList[E]) AddAll(col []E) bool {
-	res := true
+	res := false
 	for _, e := range col {
-		if !l.Add(e) {
-			res = false
+		if l.Add(e) {
+			res = true
 		}
 	}
 	return res
 }
 
 func (l *linkedList[E]) RemoveAll(col []E) bool {
-	res := true
+	res := false
 	for _, e := range col {
-		if !l.Remove(e) {
-			res = false
+		if l.Remove(e) {
+			res = true
 		}
 	}
 	return res
@@ -153,7 +176,7 @@ func (l *linkedList[E]) MarshalJSON() ([]byte, error) {
 }
 
 func (l *linkedList[E]) UnmarshalJSON(bytes []byte) error {
-	var elements []E
+	elements := make([]E, 0)
 	err := json.Unmarshal(bytes, &elements)
 	if err == nil {
 		l.Clear()
@@ -162,20 +185,22 @@ func (l *linkedList[E]) UnmarshalJSON(bytes []byte) error {
 	return err
 }
 
-func (l *linkedList[E]) Get(index int) (*E, bool) {
+func (l *linkedList[E]) Get(index int) (E, bool) {
 	if !l.withinRange(index) {
-		return nil, false
+		tempMap := make(map[int]E, 0)
+		value, found := tempMap[index]
+		return value, found
 	}
 	if l.size-index < index {
 		element := l.last
 		for e := l.size - 1; e != index; e, element = e-1, element.prev {
 		}
-		return &element.value, true
+		return element.value, true
 	}
 	element := l.first
 	for e := 0; e != index; e, element = e+1, element.next {
 	}
-	return &element.value, true
+	return element.value, true
 }
 
 func (l *linkedList[E]) Set(index int, e E) {

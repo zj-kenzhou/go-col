@@ -7,7 +7,7 @@ import (
 
 type syncHashSet[E comparable] struct {
 	sync.RWMutex
-	uss hashSet[E]
+	uss *hashSet[E]
 }
 
 func (s *syncHashSet[E]) Size() int {
@@ -47,10 +47,10 @@ func (s *syncHashSet[E]) ContainsAll(col []E) bool {
 func (s *syncHashSet[E]) AddAll(col []E) bool {
 	s.Lock()
 	defer s.Unlock()
-	res := true
+	res := false
 	for _, e := range col {
-		if !s.uss.Add(e) {
-			res = false
+		if s.uss.Add(e) {
+			res = true
 		}
 	}
 	return res
@@ -59,10 +59,10 @@ func (s *syncHashSet[E]) AddAll(col []E) bool {
 func (s *syncHashSet[E]) RemoveAll(col []E) bool {
 	s.Lock()
 	defer s.Unlock()
-	res := true
+	res := false
 	for _, e := range col {
-		if !s.uss.Remove(e) {
-			res = false
+		if s.uss.Remove(e) {
+			res = true
 		}
 	}
 	return res
@@ -74,7 +74,7 @@ func (s *syncHashSet[E]) Clear() {
 	s.uss.Clear()
 }
 
-func (s *syncHashSet[E]) ForEach(f func(E) bool) {
+func (s *syncHashSet[E]) ForEach(f func(E)) {
 	s.uss.ForEach(f)
 }
 
@@ -87,6 +87,9 @@ func (s *syncHashSet[E]) UnmarshalJSON(bytes []byte) error {
 	err := json.Unmarshal(bytes, &slice)
 	if err != nil {
 		return err
+	}
+	if !s.IsEmpty() {
+		s.Clear()
 	}
 	s.AddAll(slice)
 	return nil
