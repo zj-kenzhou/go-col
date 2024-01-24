@@ -1,4 +1,5 @@
 ## A Golang Collection package
 
-### linkedlist
+### linkedList
 ### hashSet
+### linkedHashMap
