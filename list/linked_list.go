@@ -152,20 +152,20 @@ func (l *linkedList[E]) UnmarshalJSON(bytes []byte) error {
 	return err
 }
 
-func (l *linkedList[E]) Get(index int) any {
+func (l *linkedList[E]) Get(index int) (*E, bool) {
 	if !l.withinRange(index) {
-		return nil
+		return nil, false
 	}
 	if l.size-index < index {
 		element := l.last
 		for e := l.size - 1; e != index; e, element = e-1, element.prev {
 		}
-		return element.value
+		return &element.value, true
 	}
 	element := l.first
 	for e := 0; e != index; e, element = e+1, element.next {
 	}
-	return element.value
+	return &element.value, true
 }
 
 func (l *linkedList[E]) Set(index int, e E) {
