@@ -21,7 +21,8 @@ func (m *linkedHashMap[K, V]) IsEmpty() bool {
 }
 
 func (m *linkedHashMap[K, V]) ContainsKey(k K) bool {
-	return m.ordering.Contains(k)
+	_, ok := m.table[k]
+	return ok
 }
 
 func (m *linkedHashMap[K, V]) Found(k K) (V, bool) {

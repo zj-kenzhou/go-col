@@ -2,9 +2,6 @@ package set
 
 import (
 	"encoding/json"
-	"fmt"
-	"sort"
-	"strings"
 )
 
 type hashSet[E comparable] map[E]struct{}
@@ -27,19 +24,15 @@ func (s *hashSet[E]) ToSlice() []E {
 	for e := range *s {
 		res = append(res, e)
 	}
-	sort.Slice(res, func(i, j int) bool {
-		return strings.Compare(fmt.Sprintf("%v", res[i]), fmt.Sprintf("%v", res[j])) <= 0
-	})
 	return res
 }
 
 func (s *hashSet[E]) Add(e E) bool {
-	res := true
 	if s.Contains(e) {
-		res = false
+		return false
 	}
 	(*s)[e] = struct{}{}
-	return res
+	return true
 }
 
 func (s *hashSet[E]) Remove(e E) bool {
