@@ -81,9 +81,6 @@ func (l *linkedList[E]) Remove(e E) bool {
 			removeItem = nil
 		}
 	}
-	if removeItem != nil {
-		removeItem = nil
-	}
 	return res
 }
 
@@ -187,7 +184,7 @@ func (l *linkedList[E]) UnmarshalJSON(bytes []byte) error {
 
 func (l *linkedList[E]) Get(index int) (E, bool) {
 	if !l.withinRange(index) {
-		tempMap := make(map[int]E, 0)
+		tempMap := make(map[int]E)
 		value, found := tempMap[index]
 		return value, found
 	}

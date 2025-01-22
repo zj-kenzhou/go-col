@@ -3,8 +3,9 @@ package cmap
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/zj-kenzhou/go-col/list"
 	"sort"
+
+	"github.com/zj-kenzhou/go-col/list"
 )
 
 type linkedHashMap[K comparable, V any] struct {
@@ -61,11 +62,10 @@ func (m *linkedHashMap[K, V]) Keys() []K {
 
 func (m *linkedHashMap[K, V]) Values() []V {
 	values := make([]V, m.Size())
-	count := 0
-	for _, value := range m.table {
-		values[count] = value
-		count++
-	}
+	m.ordering.ForEach(func(i int, e K) bool {
+		values[i] = m.table[e]
+		return false
+	})
 	return values
 }
 
