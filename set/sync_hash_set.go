@@ -11,6 +11,8 @@ type syncHashSet[E comparable] struct {
 }
 
 func (s *syncHashSet[E]) Size() int {
+	s.RLock()
+	defer s.RUnlock()
 	return s.uss.Size()
 }
 
@@ -19,10 +21,14 @@ func (s *syncHashSet[E]) IsEmpty() bool {
 }
 
 func (s *syncHashSet[E]) Contains(e E) bool {
+	s.RLock()
+	defer s.RUnlock()
 	return s.uss.Contains(e)
 }
 
 func (s *syncHashSet[E]) ToSlice() []E {
+	s.RLock()
+	defer s.RUnlock()
 	return s.uss.ToSlice()
 }
 
@@ -41,6 +47,8 @@ func (s *syncHashSet[E]) Remove(e E) bool {
 }
 
 func (s *syncHashSet[E]) ContainsAll(col []E) bool {
+	s.RLock()
+	defer s.RUnlock()
 	return s.uss.ContainsAll(col)
 }
 
@@ -75,10 +83,14 @@ func (s *syncHashSet[E]) Clear() {
 }
 
 func (s *syncHashSet[E]) ForEach(f func(E)) {
+	s.RLock()
+	defer s.RUnlock()
 	s.uss.ForEach(f)
 }
 
 func (s *syncHashSet[E]) MarshalJSON() ([]byte, error) {
+	s.RLock()
+	defer s.RUnlock()
 	return json.Marshal(s.ToSlice())
 }
 
