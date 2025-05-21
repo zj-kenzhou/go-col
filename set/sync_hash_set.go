@@ -17,7 +17,9 @@ func (s *syncHashSet[E]) Size() int {
 }
 
 func (s *syncHashSet[E]) IsEmpty() bool {
-	return s.Size() == 0
+	s.RLock()
+	defer s.RUnlock()
+	return s.uss.Size() == 0
 }
 
 func (s *syncHashSet[E]) Contains(e E) bool {
@@ -91,18 +93,22 @@ func (s *syncHashSet[E]) ForEach(f func(E)) {
 func (s *syncHashSet[E]) MarshalJSON() ([]byte, error) {
 	s.RLock()
 	defer s.RUnlock()
-	return json.Marshal(s.ToSlice())
+	return json.Marshal(s.uss.ToSlice())
 }
 
 func (s *syncHashSet[E]) UnmarshalJSON(bytes []byte) error {
+	s.Lock()
+	defer s.Unlock()
 	var slice []E
 	err := json.Unmarshal(bytes, &slice)
 	if err != nil {
 		return err
 	}
-	if !s.IsEmpty() {
-		s.Clear()
+	if s.uss.Size() > 0 {
+		s.uss.Clear()
 	}
-	s.AddAll(slice)
+	for _, e := range slice {
+		s.uss.Add(e)
+	}
 	return nil
 }
