@@ -138,6 +138,13 @@ func TestLinkedHashSet_ForEach(t *testing.T) {
 	})
 }
 
+func TestLinkedHashSet_Iterator(t *testing.T) {
+	set := NewLinkedHashSet[string]("aa", "bb", "cc")
+	for s := range set.Iterator() {
+		t.Log(s)
+	}
+}
+
 func TestLinkedHashSet_MarshalJSON(t *testing.T) {
 	set := NewLinkedHashSet[string]("aa", "bb", "cc")
 	bytes, err := json.Marshal(set)

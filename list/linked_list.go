@@ -2,6 +2,7 @@ package list
 
 import (
 	"encoding/json"
+	"iter"
 	"reflect"
 )
 
@@ -165,6 +166,18 @@ func (l *linkedList[E]) ForEach(f func(i int, e E) bool) {
 			return
 		}
 		index++
+	}
+}
+
+func (l *linkedList[E]) Iterator() iter.Seq2[int, E] {
+	index := 0
+	return func(yield func(int, E) bool) {
+		for element := l.first; element != nil; element = element.next {
+			if !yield(index, element.value) {
+				return
+			}
+			index++
+		}
 	}
 }
 

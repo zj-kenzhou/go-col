@@ -3,6 +3,7 @@ package cmap
 import (
 	"bytes"
 	"encoding/json"
+	"iter"
 	"sort"
 
 	"github.com/zj-kenzhou/go-col/list"
@@ -70,9 +71,16 @@ func (m *linkedHashMap[K, V]) Values() []V {
 }
 
 func (m *linkedHashMap[K, V]) ForEach(f func(k K, v V) bool) {
-	for key, value := range m.table {
-		if f(key, value) {
-			return
+	m.ordering.ForEach(func(i int, e K) bool {
+		return f(e, m.table[e])
+	})
+}
+func (m *linkedHashMap[K, V]) Iterator() iter.Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		for _, k := range m.ordering.Iterator() {
+			if !yield(k, m.table[k]) {
+				return
+			}
 		}
 	}
 }

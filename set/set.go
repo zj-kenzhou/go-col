@@ -1,6 +1,8 @@
 package set
 
 import (
+	"iter"
+
 	"github.com/zj-kenzhou/go-col"
 	"github.com/zj-kenzhou/go-col/list"
 )
@@ -8,6 +10,7 @@ import (
 type Set[E comparable] interface {
 	col.Collection[E]
 	ForEach(func(E))
+	Iterator() iter.Seq[E]
 }
 
 func NewSet[T comparable](values ...T) Set[T] {

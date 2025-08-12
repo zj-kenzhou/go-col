@@ -142,6 +142,25 @@ func TestLinkedHashMap_ForEach(t *testing.T) {
 	})
 }
 
+func TestLinkedHashMap_Iterator(t *testing.T) {
+	linkedHashMap := NewLinkedHashMap[string, int]()
+	linkedHashMap.Put("aa", 1)
+	linkedHashMap.Put("bb", 2)
+
+	for k, v := range linkedHashMap.Iterator() {
+		if k == "aa" && v != 1 {
+			t.Error("k v err")
+		}
+		if k == "bb" && v != 2 {
+			t.Error("k v err")
+		}
+		t.Log(fmt.Sprintf("key is %s value is %v", k, v))
+		if k == "aa" {
+			break
+		}
+	}
+}
+
 func TestLinkedHashMap_MarshalJSON(t *testing.T) {
 	linkedHashMap := NewLinkedHashMap[string, int]()
 	linkedHashMap.Put("aa", 1)

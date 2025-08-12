@@ -2,6 +2,8 @@ package set
 
 import (
 	"encoding/json"
+	"iter"
+
 	"github.com/zj-kenzhou/go-col/list"
 )
 
@@ -84,6 +86,16 @@ func (s *linkedHashSet[E]) Clear() {
 func (s *linkedHashSet[E]) ForEach(f func(E)) {
 	for e := range s.table {
 		f(e)
+	}
+}
+
+func (s *linkedHashSet[E]) Iterator() iter.Seq[E] {
+	return func(yield func(E) bool) {
+		for e := range s.table {
+			if !yield(e) {
+				return
+			}
+		}
 	}
 }
 

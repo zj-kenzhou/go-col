@@ -174,6 +174,13 @@ func TestSyncHashSet_ForEach(t *testing.T) {
 	})
 }
 
+func TestSyncHashSet_Iterator(t *testing.T) {
+	set := NewSyncSet[string]("aa", "bb", "cc")
+	for s := range set.Iterator() {
+		t.Log(s)
+	}
+}
+
 func TestSyncHashSet_MarshalJSON(t *testing.T) {
 	set := NewSyncSet[string]("aa", "bb", "cc")
 	bytes, err := json.Marshal(set)

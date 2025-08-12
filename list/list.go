@@ -1,6 +1,10 @@
 package list
 
-import "github.com/zj-kenzhou/go-col"
+import (
+	"iter"
+
+	"github.com/zj-kenzhou/go-col"
+)
 
 type List[E any] interface {
 	col.Collection[E]
@@ -9,6 +13,7 @@ type List[E any] interface {
 	RemoveIndex(index int)
 	IndexOf(e E) int
 	ForEach(f func(i int, e E) bool)
+	Iterator() iter.Seq2[int, E]
 }
 
 func NewLinkedList[E any](values ...E) List[E] {

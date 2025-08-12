@@ -2,6 +2,7 @@ package set
 
 import (
 	"encoding/json"
+	"iter"
 	"sync"
 )
 
@@ -88,6 +89,18 @@ func (s *syncHashSet[E]) ForEach(f func(E)) {
 	s.RLock()
 	defer s.RUnlock()
 	s.uss.ForEach(f)
+}
+
+func (s *syncHashSet[E]) Iterator() iter.Seq[E] {
+	return func(yield func(E) bool) {
+		s.RLock()
+		defer s.RUnlock()
+		for e := range s.uss.Iterator() {
+			if !yield(e) {
+				return
+			}
+		}
+	}
 }
 
 func (s *syncHashSet[E]) MarshalJSON() ([]byte, error) {

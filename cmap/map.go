@@ -2,6 +2,8 @@ package cmap
 
 import (
 	"encoding/json"
+	"iter"
+
 	"github.com/zj-kenzhou/go-col/list"
 )
 
@@ -17,6 +19,7 @@ type Map[K comparable, V any] interface {
 	Keys() []K
 	Values() []V
 	ForEach(f func(k K, v V) bool)
+	Iterator() iter.Seq2[K, V]
 	json.Marshaler
 	json.Unmarshaler
 }

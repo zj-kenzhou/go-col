@@ -2,6 +2,7 @@ package set
 
 import (
 	"encoding/json"
+	"iter"
 )
 
 type hashSet[E comparable] map[E]struct{}
@@ -82,6 +83,16 @@ func (s *hashSet[E]) Clear() {
 func (s *hashSet[E]) ForEach(f func(E)) {
 	for e := range *s {
 		f(e)
+	}
+}
+
+func (s *hashSet[E]) Iterator() iter.Seq[E] {
+	return func(yield func(E) bool) {
+		for e := range *s {
+			if !yield(e) {
+				return
+			}
+		}
 	}
 }
 

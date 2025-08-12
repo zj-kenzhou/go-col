@@ -145,6 +145,22 @@ func TestLinkedList_ForEach(t *testing.T) {
 	t.Log(res)
 }
 
+func TestLinkedList_Iterator(t *testing.T) {
+	list := NewLinkedList[string]("aa", "bb", "cc")
+	var res []string
+
+	for i, e := range list.Iterator() {
+		if i == 2 {
+			break
+		}
+		res = append(res, e)
+	}
+	if len(res) != 2 {
+		t.Error("res len not 1")
+	}
+	t.Log(res)
+}
+
 func TestLinkedList_MarshalJSON(t *testing.T) {
 	list := NewLinkedList[string]("aa", "bb", "cc", "aa")
 	res, err := json.Marshal(list)
