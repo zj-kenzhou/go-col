@@ -3,6 +3,7 @@ package set
 import (
 	"encoding/json"
 	"iter"
+	"slices"
 	"sync"
 )
 
@@ -120,7 +121,7 @@ func (s *syncHashSet[E]) UnmarshalJSON(bytes []byte) error {
 	if s.uss.Size() > 0 {
 		s.uss.Clear()
 	}
-	for _, e := range slice {
+	for e := range slices.Values(slice) {
 		s.uss.Add(e)
 	}
 	return nil

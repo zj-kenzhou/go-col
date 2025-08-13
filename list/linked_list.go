@@ -134,13 +134,10 @@ func (l *linkedList[E]) ContainsAll(col []E) bool {
 }
 
 func (l *linkedList[E]) AddAll(col []E) bool {
-	res := false
 	for _, e := range col {
-		if l.Add(e) {
-			res = true
-		}
+		l.Add(e)
 	}
-	return res
+	return true
 }
 
 func (l *linkedList[E]) RemoveAll(col []E) bool {
